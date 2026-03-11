@@ -194,6 +194,88 @@ def fetch_price_data(symbols, start_date, end_date):
         return pd.DataFrame()
 
 
+@st.cache_data(ttl=86400, show_spinner=False)
+def fetch_sector_info(symbols) -> dict:
+    """Fetch sector classification for each symbol using yfinance.
+
+    Returns
+    -------
+    dict[str, str]
+        Mapping of ticker -> GICS sector name.
+        CASH is mapped to 'Cash'. Unknown tickers default to 'Unknown'.
+    """
+    _SECTOR_NORMALIZE = {
+        'Technology': 'Technology',
+        'Financial Services': 'Financials',
+        'Healthcare': 'Health Care',
+        'Consumer Cyclical': 'Consumer Discretionary',
+        'Communication Services': 'Communication Services',
+        'Industrials': 'Industrials',
+        'Consumer Defensive': 'Consumer Staples',
+        'Energy': 'Energy',
+        'Basic Materials': 'Materials',
+        'Real Estate': 'Real Estate',
+        'Utilities': 'Utilities',
+    }
+    sector_map = {}
+    for symbol in symbols:
+        if not symbol or not isinstance(symbol, str):
+            continue
+        if symbol.upper() == 'CASH':
+            sector_map[symbol] = 'Cash'
+            continue
+        try:
+            info = yf.Ticker(symbol).info
+            raw = info.get('sector', '') or ''
+            sector_map[symbol] = _SECTOR_NORMALIZE.get(raw, raw or 'Unknown')
+        except Exception:
+            sector_map[symbol] = 'Unknown'
+    return sector_map
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def fetch_volume_data(symbols, period: str = '3mo') -> pd.DataFrame:
+    """Fetch daily trading volume for the given symbols.
+
+    Parameters
+    ----------
+    symbols : list[str]
+        Ticker list. CASH is excluded (no exchange volume).
+    period : str
+        yfinance period string, e.g. '3mo'.
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame with tickers as columns and dates as index,
+        containing daily share volume.
+    """
+    tradeable = [s for s in symbols if s and isinstance(s, str) and s.upper() != 'CASH']
+    if not tradeable:
+        return pd.DataFrame()
+    try:
+        data = yf.download(
+            tradeable, period=period,
+            progress=False, auto_adjust=True, threads=True
+        )
+        if data.empty:
+            return pd.DataFrame()
+        if len(tradeable) == 1:
+            if 'Volume' in data.columns:
+                return pd.DataFrame({tradeable[0]: data['Volume']})
+            return pd.DataFrame()
+        if isinstance(data.columns, pd.MultiIndex):
+            lvl0 = data.columns.get_level_values(0)
+            if 'Volume' in lvl0:
+                vol = data['Volume']
+                if isinstance(vol.columns, pd.MultiIndex):
+                    vol.columns = vol.columns.get_level_values(-1)
+                return vol
+        return pd.DataFrame()
+    except Exception:
+        return pd.DataFrame()
+
+
 @st.cache_data(ttl=3600, show_spinner=False)
 def fetch_fx_rates(currencies, start_date, end_date):
     """Fetch FX rates for currency conversion (vs USD)."""

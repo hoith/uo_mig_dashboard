@@ -103,7 +103,8 @@ def calculate_time_weighted_return(portfolio_df, cash_flows_df):
         'twr_total': twr_total,
         'twr_annualized': twr_annualized,
         'sub_period_returns': returns_df['return'].tolist(),
-        'daily_twr': cumulative_twr - 1  # Convert to return series
+        'daily_twr': cumulative_twr - 1,  # Cumulative TWR as return series
+        'daily_twr_returns': returns_df['return'],  # Daily returns with date index (avoids round-trip data loss)
     }
 
 
