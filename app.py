@@ -40,6 +40,7 @@ from ui.tabs.transactions import render_transactions_tab
 from ui.tabs.risk import render_risk_tab
 from ui.tabs.stress import render_stress_tab
 from ui.tabs.reports import render_reports_tab
+from ui.tabs.analytics import render_analytics_tab
 
 from data.fetchers import (fetch_price_data, fetch_iemg_weights,
                             fetch_spy_weights)
@@ -177,10 +178,9 @@ def main():
 
     # Get TWR-adjusted daily returns for Sharpe/Sortino calculations
     # These returns EXCLUDE the impact of external cash flows (pure investment performance)
-    if 'daily_twr' in twr_metrics and not twr_metrics['daily_twr'].empty:
-        # Convert cumulative TWR back to daily returns
-        cumulative_twr = twr_metrics['daily_twr'] + 1  # Convert from return to growth factor
-        twr_daily_returns = cumulative_twr.pct_change().dropna()
+    if 'daily_twr_returns' in twr_metrics and not twr_metrics['daily_twr_returns'].empty:
+        # Use daily TWR returns directly — avoids the pct_change round-trip that drops the first return
+        twr_daily_returns = twr_metrics['daily_twr_returns']
     else:
         twr_daily_returns = simple_returns
 
@@ -369,6 +369,7 @@ def main():
         "TRANSACTIONS",
         "RISK",
         "STRESS / REBALANCE",
+        "ANALYTICS",
         "REPORTS"
     ])
 
@@ -410,7 +411,8 @@ def main():
             hist_cvar=hist_cvar,
             param_var=param_var,
             param_cvar=param_cvar,
-            exante=exante
+            exante=exante,
+            benchmark_returns=benchmark_returns
         )
 
     with tabs[4]:
@@ -427,6 +429,21 @@ def main():
         )
 
     with tabs[5]:
+        render_analytics_tab(
+            portfolio_returns=portfolio_returns,
+            portfolio_df=portfolio_df,
+            prices_df=prices_df,
+            position_metrics=position_metrics,
+            benchmark_returns=benchmark_returns,
+            benchmark=benchmark,
+            metrics=metrics,
+            total_value=total_value,
+            risk_free_rate=risk_free_rate,
+            start_date=start_date,
+            end_date=end_date,
+        )
+
+    with tabs[6]:
         render_reports_tab(
             metrics=metrics,
             position_metrics=position_metrics,
