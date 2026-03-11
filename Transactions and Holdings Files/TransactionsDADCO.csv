@@ -1,0 +1,18 @@
+Date,Ticker,Action,Shares,Price,Fees,Name
+2025-04-17,CEG,Sell,14,207.1456,30.0784,Constellation Energy
+2025-06-30,AAPL,Sell,16,200.2828,30.0048,Apple
+2025-06-30,META,Sell,8,740.1532,29.9956,Meta Platforms
+2025-06-30,IVV,Buy,26,619.0611,30.0014,iShares S&P 500 index
+2025-06-30,MCD,Sell,5,291.9317,29.9985,McDonald's
+2025-06-30,MSFT,Sell,4,497.28,30.0000,Microsoft
+2025-09-25,IVV,Sell,6,658.5325,29.9950,S&P 500 ETF
+2025-09-25,CASH,Withdrawal,2634.13,1,0,Cash Rebalancing Withdrawal
+2025-11-17,LULU,Buy,23,164.16,30.00,Lululemon Athletica
+2025-12-12,UNH,Sell,8,340.6000,30.00,UnitedHealth Group Inc
+2025-12-12,IVV,Sell,10,685.4852,30.00,iShares Core S&P 500 ETF
+2025-12-12,MP,Buy,37,57.5195,30.00,MP Materials Corp
+2025-12-12,LMT,Buy,6,479.5400,30.00,Lockheed Martin Corp
+2025-12-12,NVDA,Buy,24,176.4399,30.00,Nvidia Corp
+2025-12-12,AAPL,Buy,2,278.5215,30.00,Apple Inc
+2025-12-12,MSFT,Buy,1,478.4550,30.00,Microsoft Corp
+2025-12-12,PG,Buy,1,142.7700,30.00,Procter & Gamble Co
